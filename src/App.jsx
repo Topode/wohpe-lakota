@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ChevronRight } from 'lucide-react';
@@ -171,23 +171,29 @@ const Navbar = () => {
 const Hero = ({ loaded }) => {
   const container = useRef(null);
 
+  useLayoutEffect(() => {
+    let ctx = gsap.context(() => {
+      gsap.set('.hero-word', { y: 150, skewY: 10, opacity: 0, transformOrigin: "0% 100%" });
+      gsap.set('.hero-img-wrap', { scale: 1.4, opacity: 0, rotation: 5, filter: 'sepia(100%) blur(20px)' });
+    }, container);
+    return () => ctx.revert();
+  }, []);
+
   useEffect(() => {
     if (!loaded) return;
     let ctx = gsap.context(() => {
       // Split text reveal extrême
-      gsap.from('.hero-word', {
-        y: 150,
-        skewY: 10,
-        opacity: 0,
+      gsap.to('.hero-word', {
+        y: 0,
+        skewY: 0,
+        opacity: 1,
         duration: 1.8,
         stagger: 0.08,
-        ease: 'power4.out',
-        transformOrigin: "0% 100%"
+        ease: 'power4.out'
       });
       
       // Image distorsion reveal
-      gsap.fromTo('.hero-img-wrap', 
-        { scale: 1.4, opacity: 0, rotation: 5, filter: 'sepia(100%) blur(20px)' },
+      gsap.to('.hero-img-wrap', 
         { scale: 1, opacity: 1, rotation: 0, filter: 'sepia(0%) blur(0px)', duration: 2.8, ease: 'power3.out', delay: 0.4 }
       );
 
